@@ -62,6 +62,8 @@ npm run release:mac  # DMG / ZIP / SHA256SUMS.txt
 
 [发布流程](docs/RELEASING.md) · [参与开发](CONTRIBUTING.md) · [安全问题](SECURITY.md)
 
+[小红书海报与原图](docs/social/xiaohongshu/README.md)
+
 ## 开源与复用
 
 整体采用 **AGPL-3.0-or-later**，延续 LLM for Zotero 的许可证。项目不隶属于 Zotero、LLM for Zotero 或 EmbedPDF。

@@ -1,0 +1,46 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-11",
+  "format": "PNG, 1086 × 1448, portrait 3:4",
+  "revision": 2,
+  "positioning": "AI-assisted paper reading and questions; Zotero organization and multi-paper research.",
+  "note": "The superseded generated layouts were used only as edit targets for visual continuity and are not distributed. All screenshot references contain synthetic demo papers and answers.",
+  "posters": [
+    {
+      "file": "01-paper-reader.png",
+      "prompt": "Use case: ads-marketing. EDIT the first input poster to correct its product positioning, retaining its warm ivory paper, navy type, yellow highlight, brand logo, straight-on app image and 3:4 portrait format. Produce ONE finished Xiaohongshu poster, 1086x1448 or a higher-resolution 3:4 equivalent.\nInputs: 1 = previous poster, EDIT TARGET for style and layout only; 2 = actual Flow Paper temporary conversation screenshot with synthetic demo content, supporting UI reference; 3 = real brand icon. Preserve that icon design.\nCRITICAL POSITIONING: the core product is an AI-assisted PAPER READER, to read papers, ask questions about what you are reading, understand figures, and keep notes. The hero message must NOT be moving/docking chat, temporary history, or a minor UI detail. The old headline “读论文，随手问一句。” and old annotation “临时问一句，默认不进历史” must be removed.\nDesign a polished new hierarchy: brand top; exceptionally large two-line Chinese headline; concise descriptive subheading; one large screenshot-based scene of a scientific PDF with a selected sentence and a readable contextual question/answer window; beneath it three meaningful use cases in a clean horizontal or vertically staggered editorial layout. Show one modest hand-drawn underline, no arrows about moving windows. Crop the boring empty part of the screenshot, preserve recognizable actual UI. Synthetic paper and demo answer are acceptable, do not make up new capabilities. Frame the product as a useful reader rather than a UI trick.\nEXACT EXTERNAL COPY:\n“Flow Paper”\n“能对话的”\n“论文阅读器”\n“边读边问，把问题留在阅读现场。”\n“读不懂的段落，选中就问”\n“看不明白的图表，截图提问”\n“有用的回答，留下笔记”\n“开源 · Mac · Apple 芯片”\n“github.com/xyizhan/flow-paper”\nFine print: “模型需自行配置 · 界面为演示内容”\nSmall page number “01”.\nNo extra slogans, no docking labels, no claim of free models, instant perfect answers, zero lag, whole-library autonomous reading or native paper classification within Flow Paper. No QR code. A clear, attractive, human-designed product introduction at phone-screen size.",
+      "inputs": [
+        {
+          "role": "edit target",
+          "source": "Superseded generated cover layout (not distributed)"
+        },
+        {
+          "role": "supporting UI reference",
+          "path": "../../assets/quick-chat.png"
+        },
+        {
+          "role": "brand icon",
+          "path": "../../../assets/icon.png"
+        }
+      ]
+    },
+    {
+      "file": "02-connected-reading.png",
+      "prompt": "Use case: ads-marketing. EDIT the first input poster to completely replace the docking-centric message with Zotero-based literature organization and MULTI-PAPER READING / Q&A. Produce ONE final Xiaohongshu 3:4 portrait poster, 1086x1448 or higher-resolution 3:4 equivalent.\nInputs: 1 = previous poster EDIT TARGET: retain ivory paper, navy Chinese typography, blue/yellow accents, small icon + Flow Paper brand, compact bottom GitHub line. 2 = actual reader UI with two selected demo papers. 3 = actual chat UI with multi-paper scope and page citations. These are compositing references and synthetic demonstration data.\nThe old title “对话框，放在顺手的地方。” MUST be removed, along with “弹出，独立对话”, “靠近右侧，松手吸附”, the two-window-mode comparison, and the docking arrow. Do not advertise movement/docking as a feature in this poster.\nNew concept: literature stays organized in Zotero; Flow Paper is the independent place to read and discuss it. Selecting several papers allows asking comparative questions with links back to source pages. Flow Paper READS Zotero categories; it does not automatically organize papers or write back categories. Reflect this accurately.\nComposition: brand top left, small 02 top right. Big confident Chinese headline on two lines. A succinct subtitle. The hero in the middle is ONE integrated screenshot-inspired paper reader: left literature list with two checkboxes selected, a PDF in the center and a conversation panel on the right that shows the scope “勾选的论文”, a sample question “这两篇论文的方法有什么不同？” and a short mock reply with blue source-page links. Preserve the provided app's actual visual language and controls. Let the app occupy a large, readable area. No need to compare window modes. Outside the screenshot, a clean research workflow ribbon with 3 steps: “Zotero 分类” → “Flow Paper 阅读” → “跨论文对话”. Bottom has three short real capabilities set in editorial typography rather than decorative cards.\nEXACT EXTERNAL COPY:\n“Flow Paper”\n“整理好的文献，”\n“连起来读。”\n“用 Zotero 分类，用 Flow Paper 阅读与提问。”\n“Zotero 分类”\n“Flow Paper 阅读”\n“跨论文对话”\n“勾选多篇，一起比较”\n“检索已索引文献库”\n“回答带原文页码”\n“开源 · Mac · Apple 芯片”\n“github.com/xyizhan/flow-paper”\nFine print: “模型需自行配置 · 界面为演示内容”\nNo extra slogans, automatic organization claim, Paperlib support claim, entire-library-read claim, free-model claim, QR codes or watermarks. A compelling companion to a cover headed “能对话的论文阅读器”.",
+      "inputs": [
+        {
+          "role": "edit target",
+          "source": "Superseded generated companion layout (not distributed)"
+        },
+        {
+          "role": "supporting reader UI reference",
+          "path": "references/reader.png"
+        },
+        {
+          "role": "supporting chat UI reference",
+          "path": "references/conversation-window.png"
+        }
+      ]
+    }
+  ]
+}

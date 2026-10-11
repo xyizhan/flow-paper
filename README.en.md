@@ -2,6 +2,8 @@
 
 [中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2)
 
+[Social posters (Chinese)](docs/social/xiaohongshu/README.md)
+
 An independent macOS paper reader with contextual AI chat, built on [LLM for Zotero](https://github.com/yilewang/llm-for-zotero) and [EmbedPDF](https://github.com/embedpdf/embed-pdf-viewer). Organize papers in Zotero; read, annotate and discuss them in Flow Paper.
 
 - Select text or capture a figure for a temporary conversation next to the paper. Nothing is saved to chat history unless explicitly retained.
