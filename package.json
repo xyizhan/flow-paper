@@ -27,7 +27,7 @@
     "pdf-lib": "1.17.1"
   },
   "devDependencies": {
-    "@electron/packager": "^19.0.0",
+    "@electron/packager": "20.3.0",
     "electron": "44.7.0",
     "esbuild": "0.25.12",
     "playwright": "^1.56.0",
