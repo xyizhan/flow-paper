@@ -1,6 +1,6 @@
 # Flow Paper
 
-[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.1)
+[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2)
 
 An independent macOS paper reader with contextual AI chat, built on [LLM for Zotero](https://github.com/yilewang/llm-for-zotero) and [EmbedPDF](https://github.com/embedpdf/embed-pdf-viewer). Organize papers in Zotero; read, annotate and discuss them in Flow Paper.
 
@@ -14,9 +14,9 @@ An independent macOS paper reader with contextual AI chat, built on [LLM for Zot
 
 ## Install
 
-The first public preview, `0.2.0-beta.1`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
+The first public preview, `0.2.0-beta.2`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
 
-Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.1), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
+Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
 
 The current interface and detailed user documentation are in Chinese. Model replies can be requested in any language.
 

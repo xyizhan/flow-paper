@@ -41,13 +41,14 @@ const zoteroServer=http.createServer((req,res)=>{
   ]));return;}
   res.writeHead(404);res.end('{}');
 });
-const zoteroAvailable=await new Promise(resolve=>{zoteroServer.once('error',()=>resolve(false));zoteroServer.listen(23119,'127.0.0.1',()=>resolve(true));});
+await new Promise((resolve,reject)=>{zoteroServer.once('error',reject);zoteroServer.listen(0,'127.0.0.1',resolve);});
+const testEnv={...process.env,FLOW_PAPER_DATA_DIR:dataDir,FLOW_PAPER_TEST_ZOTERO_PORT:String(zoteroServer.address().port)};
 const executable=process.env.FLOW_PAPER_EXECUTABLE || process.env.SU_PAPER_EXECUTABLE;
 const launchOptions=executable?{executablePath:executable,args:[]}:{args:['.']};
 const errors=[];
 let desktop;
 try {
-  desktop=await electron.launch({...launchOptions,env:{...process.env,FLOW_PAPER_DATA_DIR:dataDir},timeout:60000});
+  desktop=await electron.launch({...launchOptions,env:testEnv,timeout:60000});
   const page=await desktop.firstWindow();
   const observe=p=>{p.on('pageerror',e=>{errors.push(e.message);console.error(e.stack);});p.on('console',m=>{if(m.type()==='error')console.log('renderer:',m.text());});};observe(page);
   await page.waitForFunction(()=>!!window.__suPaper,{timeout:60000});
@@ -185,9 +186,8 @@ try {
   await chat.screenshot({path:path.join(output,'conversation-window.png')});
   await page.screenshot({path:path.join(output,'reader.png')});
   console.log('PASS multi-paper context across windows');
-  if(zoteroAvailable){await page.locator('#zotero-button').click();await page.getByText('Zotero fixture paper',{exact:true}).click();await page.waitForFunction(()=>window.__suPaper.getState().papers.some(p=>p.source==='zotero'&&p.indexed));console.log('PASS Zotero metadata and local attachment resolution');}
-  else console.log('SKIP fake Zotero: actual Zotero occupies port; existing service untouched');
-  await page.evaluate(async()=>{const s=window.__suPaper,id=s.getState().papers[0].id;await s.openPaper(id);s.capability('annotation').forDocument(id).createAnnotation(1,{id:'quick-close-mark',type:5,pageIndex:1,rect:{origin:{x:30,y:30},size:{width:180,height:20}},color:'#fff19a',opacity:0.4,strokeWidth:1,strokeColor:'#e5b143',flags:[],created:new Date()});const lateUI=s.capability('ui').forDocument(id),lateZoom=s.capability('zoom').forDocument(id);await s.capability('document-manager').closeDocument(id).toPromise();if(!lateUI.getState()||!lateZoom.getState())throw new Error('Late toolbar effects lost state');await s.flush();await s.openPaper(id,2);});
+  {await page.locator('#zotero-button').click();await page.getByText('Zotero fixture paper',{exact:true}).click();await page.waitForFunction(()=>window.__suPaper.getState().papers.some(p=>p.source==='zotero'&&p.indexed));console.log('PASS Zotero metadata and local attachment resolution');}
+  await page.evaluate(async()=>{const s=window.__suPaper,id=s.getState().papers[0].id;await s.openPaper(id);s.capability('annotation').forDocument(id).createAnnotation(1,{id:'quick-close-mark',type:5,pageIndex:1,rect:{origin:{x:30,y:30},size:{width:180,height:20}},color:'#fff19a',opacity:0.4,strokeWidth:1,strokeColor:'#e5b143',flags:[],created:new Date()});const lateUI=s.capability('ui').forDocument(id),lateZoom=s.capability('zoom').forDocument(id);await s.capability('document-manager').closeDocument(id).toPromise();if(!lateUI.getState()||!lateZoom.getState())throw new Error('Late toolbar effects lost state');const scroll=s.registry.getPlugin('scroll');let lateEvent=false;scroll.onScrollerData(id,()=>lateEvent=true)();if(lateEvent)throw new Error('Closed scroller emitted a layout');await s.flush();await s.openPaper(id,2);let liveEvent=false;scroll.onScrollerData(id,()=>liveEvent=true)();if(!liveEvent)throw new Error('Reopened scroller lost live layout subscription');});
   assert.ok(await page.evaluate(()=>{const s=window.__suPaper;return !!s.capability('annotation').forDocument(s.getState().papers[0].id).getAnnotationById('quick-close-mark')}));
   await chat.locator('#prompt').fill('SLOW_STREAM：保留已生成部分');await chat.locator('#send-button').click();
   await chat.waitForFunction(()=>{const c=window.__suPaper.getState().conversations.find(c=>c.id===document.getElementById('conversation-select').value);return c.messages.at(-1)?.status==='streaming'&&c.messages.at(-1)?.content.length>5;});
@@ -209,7 +209,7 @@ try {
   console.log('PASS chat reopen and immediate PDF tab close preserve notes, history and annotations');
   assert.deepEqual(errors,[]);
   await desktop.close();desktop=null;
-  desktop=await electron.launch({...launchOptions,env:{...process.env,FLOW_PAPER_DATA_DIR:dataDir},timeout:60000});
+  desktop=await electron.launch({...launchOptions,env:testEnv,timeout:60000});
   const restored=await desktop.firstWindow();
   await restored.waitForFunction(()=>{const s=window.__suPaper;if(!s)return false;try{return s.capability('annotation').forDocument(s.getState().papers[0].id).getAnnotationById('quick-close-mark');}catch{return false;}},undefined,{timeout:30000});
   stored=JSON.parse(await readFile(path.join(dataDir,'workspace.json'),'utf8'));
@@ -221,5 +221,5 @@ try {
 } finally {
   if(desktop)await desktop.close();
   await new Promise(r=>server.close(r));
-  if(zoteroAvailable)await new Promise(r=>zoteroServer.close(r));
+  await new Promise(r=>zoteroServer.close(r));
 }

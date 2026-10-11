@@ -1,6 +1,6 @@
 # 验证范围
 
-首个公开版本：0.2.0-beta.1。开发机为 Apple Silicon / macOS 26.5，最低 macOS 13 来自 Electron 运行时要求，并未声称已在每个系统版本测试。
+首个公开版本：0.2.0-beta.2。开发机为 Apple Silicon / macOS 26.5，最低 macOS 13 来自 Electron 运行时要求，并未声称已在每个系统版本测试。
 
 ## 可重复的离线回归
 
@@ -8,7 +8,7 @@
 
 覆盖：PDF 文字选择、高亮、撤销/重做、批注前后缩放；临时翻译、拖动、防溢出、取消后隔离、不写历史；截图多模态请求；多篇上下文与来源跳转；长期对话停靠/弹出/吸附、草稿/附件/流保留；宽度调整；笔记、批注、对话关闭与重启恢复；快速关闭 PDF 标签的迟到 UI 状态读取。
 
-构建安装包后，用 `FLOW_PAPER_EXECUTABLE="$PWD/release/Flow Paper-darwin-arm64/Flow Paper.app/Contents/MacOS/Flow Paper" npm run test:e2e` 对实际 .app 重复回归。测试使用独立工作区，不读取用户模型设置。23119 被真实 Zotero 占用时，测试会跳过模拟 Zotero 项，不读取真实库。
+构建安装包后，用 `FLOW_PAPER_EXECUTABLE="$PWD/release/Flow Paper-darwin-arm64/Flow Paper.app/Contents/MacOS/Flow Paper" npm run test:e2e` 对实际 .app 重复回归。测试使用独立工作区，不读取用户模型设置。模拟 Zotero 使用独立随机端口，即使本机 Zotero 正在运行也覆盖接入流程，不读取真实库。
 
 ## 真实数据的开发验证
 

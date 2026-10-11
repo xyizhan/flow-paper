@@ -24,7 +24,7 @@ Flow Paper is an AGPL-3.0-or-later integration of existing projects.
   Local glue batches command-state notifications once per animation frame and
   closes the SDK capture preview through its own handler after adding the image
   to chat. Read-only UI/zoom snapshots let pending toolbar effects finish after
-  a PDF tab closes. Neither upstream source checkout is modified.
+  a PDF tab closes; late scroll subscriptions for fully closed documents become inert. Reopened documents subscribe normally. Neither upstream source checkout is modified.
 - **DOMPurify**, Apache-2.0 OR MPL-2.0. Sanitizes rendered model output.
 - **Electron**, MIT. Desktop host and operating-system integration.
 - Upstream Markdown rendering uses marked (MIT), KaTeX (MIT), and

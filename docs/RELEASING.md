@@ -2,7 +2,7 @@
 
 参考同系列 Flow Translate：先验证，再生成安装包、源码包和校验文件，发布到 GitHub Releases。当前平台为 macOS arm64。
 
-1. 更新 package.json / package-lock.json 的版本和 README 下载链接。首个公开版本为 0.2.0-beta.1。
+1. 更新 package.json / package-lock.json 的版本和 README 下载链接。首个公开版本为 0.2.0-beta.2。
 2. 初始化子模块，`npm ci`，运行 `npm run verify` 和 `npm run audit`。
 3. 退出已运行的目标打包应用，再运行 `npm run package:mac`。脚本只将构建产物白名单复制到临时目录，收集运行时许可证，生成图标，打包并作本地 ad-hoc 签名。
 4. 用 `FLOW_PAPER_EXECUTABLE="$PWD/release/Flow Paper-darwin-arm64/Flow Paper.app/Contents/MacOS/Flow Paper" npm run test:e2e` 验证最终 .app。签名完整性校验不等于 Apple 公证。

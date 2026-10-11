@@ -19,6 +19,26 @@ export function coalesceCommandUpdates(registry: any) {
 }
 
 export function preserveClosingViewState(registry: any) {
+  // A pending Scroller effect can subscribe after its document and emitter have
+  // already been removed. Only subscriptions for known, fully closed documents
+  // are inert; live documents retain upstream behavior (including errors).
+  const scroll = registry.getPlugin('scroll');
+  if (scroll?.onScrollerData && scroll.onDocumentClosed) {
+    const closed = new Set<string>();
+    const close = scroll.onDocumentClosed.bind(scroll);
+    const loading = scroll.onDocumentLoadingStarted.bind(scroll);
+    const subscribe = scroll.onScrollerData.bind(scroll);
+    scroll.onDocumentClosed = (id: string) => {
+      closed.add(id);
+      if (closed.size > 200) closed.delete(closed.values().next().value!);
+      close(id);
+    };
+    scroll.onDocumentLoadingStarted = (id: string) => { closed.delete(id); loading(id); };
+    scroll.onScrollerData = (id: string, callback: any) => {
+      if (closed.has(id) && !registry.getStore().getState().core.documents[id]) return () => {};
+      return subscribe(id, callback);
+    };
+  }
   // Preact can finish a toolbar's pending effect after the PDF close action has
   // removed plugin state. Keep only the read-only UI snapshot during unmount;
   // live/reopened documents and every mutation still use the upstream APIs.

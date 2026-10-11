@@ -112,7 +112,9 @@ async function importPaths(paths: string[]) {
   return { state: publicState(), imported };
 }
 async function zotero(endpoint: string) {
-  const response = await fetch(`http://127.0.0.1:23119/api/${endpoint}`, { signal: AbortSignal.timeout(12000), headers: { 'Zotero-API-Version': '3' } });
+  const port = process.env.FLOW_PAPER_TEST_ZOTERO_PORT || '23119';
+  if (!/^\d+$/.test(port) || +port < 1 || +port > 65535) throw new Error('Invalid Zotero port');
+  const response = await fetch(`http://127.0.0.1:${port}/api/${endpoint}`, { signal: AbortSignal.timeout(12000), headers: { 'Zotero-API-Version': '3' } });
   if (!response.ok) throw new Error(response.status === 403 ? '请在 Zotero → 设置 → 高级中允许本机其他应用通信。' : `Zotero 返回 ${response.status}`);
   return response;
 }
