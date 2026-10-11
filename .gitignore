@@ -1,0 +1,12 @@
+node_modules/
+dist/
+release/
+test-output/
+.DS_Store
+*.log
+.env
+.env.*
+*.p12
+*.p8
+*.keychain*
+.local/

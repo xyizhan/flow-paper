@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'">
+  <title>Flow Paper</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="katex/katex.min.css">
+</head>
+<body>
+  <header class="appbar">
+    <button id="toggle-library" class="icon-button reader-only" title="显示或隐藏文献库" aria-label="显示或隐藏文献库"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <h1 id="paper-title">文献库</h1>
+    <div class="toolbar-actions">
+      <button id="selection-button" class="quiet reader-only" disabled title="对当前选区临时提问">选区提问</button>
+      <button id="capture-button" class="quiet reader-only" disabled><svg viewBox="0 0 24 24"><path d="M4 8V4h4m8 0h4v4M4 16v4h4m8 0h4v-4"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>截图</button>
+      <span class="toolbar-divider reader-only"></span>
+      <button id="open-notes" class="quiet reader-only"><svg viewBox="0 0 24 24"><path d="M14 4H5v16h14v-9M10 14l1-4 8-8 3 3-8 8-4 1z"/></svg>笔记</button>
+      <button id="open-chat" class="quiet reader-only" title="打开对话 · ⌘⇧J"><svg viewBox="0 0 24 24"><path d="M20 15a3 3 0 0 1-3 3H9l-5 3v-5a3 3 0 0 1-2-3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z"/><path d="M7 8h8M7 12h5"/></svg>对话</button>
+      <button id="settings-button" class="icon-button" title="模型设置" aria-label="模型设置"><svg viewBox="0 0 24 24"><path d="m9 3-1 3-3 1 1 3-2 2 2 2-1 3 3 1 1 3h6l1-3 3-1-1-3 2-2-2-2 1-3-3-1-1-3z"/><circle cx="12" cy="12" r="3"/></svg><span id="model-indicator" class="dot"></span></button>
+    </div>
+  </header>
+  <main class="workspace">
+    <aside class="library">
+      <div class="section-heading"><span>文献库</span><span id="paper-count">0</span><div class="library-tools"><button id="import-button" class="quiet small" title="添加 PDF">＋ PDF</button><button id="zotero-button" class="quiet small" title="连接或刷新本机 Zotero">Zotero ↻</button></div></div>
+      <input id="library-search" class="search" placeholder="搜索标题、作者" aria-label="搜索论文">
+      <select id="collection-filter" aria-label="筛选分类"><option value="">全部分类</option></select>
+      <div id="library-list" class="library-list"></div>
+      <div class="library-footer"><span id="index-status"></span><button id="index-all" class="quiet small">索引</button></div>
+    </aside>
+    <div id="library-divider" role="separator" tabindex="0" aria-label="调整文献库宽度" aria-orientation="vertical"></div>
+    <section class="reader-area">
+      <div id="pdf-viewer"></div>
+      <div id="reader-empty"><button id="empty-import" class="secondary">＋ 打开 PDF</button><span>或将文件拖到这里</span></div>
+    </section>
+    <div id="research-divider" role="separator" tabindex="0" aria-label="调整对话宽度" aria-orientation="vertical" hidden></div>
+    <div id="research-slot" hidden></div>
+    <section class="research">
+      <div class="research-tabs"><span id="research-drag" title="拖动弹出对话" aria-hidden="true">⠿</span><button id="chat-tab" class="active">对话</button><button id="notes-tab">笔记</button><button id="new-chat" class="quiet" title="新建对话" aria-label="新建对话">＋</button><span id="research-tools"><button id="research-mode" title="弹出独立窗口" aria-label="弹出独立窗口"><svg viewBox="0 0 24 24"><path d="M14 3h7v7m0-7L11 13M10 5H4v15h15v-6"/></svg></button><button id="research-close" title="收起对话" aria-label="收起对话"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></span></div>
+      <section id="chat-panel">
+        <div class="scope-row"><select id="chat-scope" aria-label="对话范围"><option value="current">当前论文</option><option value="selected">勾选的论文</option><option value="library">已索引文献库</option></select><select id="conversation-select" aria-label="历史对话"></select></div>
+        <div id="messages" class="messages"></div>
+        <div class="composer"><div id="attachments" class="attachments"></div><textarea id="prompt" rows="2" placeholder="输入问题…" aria-label="向论文提问"></textarea><div class="composer-footer"><span id="scope-label"></span><button id="send-button" class="primary" title="⌘ / Ctrl + Enter">发送 ↑</button><button id="stop-button" class="secondary" hidden>停止</button></div></div>
+      </section>
+      <section id="notes-panel" hidden><div class="notes-toolbar"><span id="notes-status">自动保存</span><button id="notes-preview" class="quiet">预览</button><button id="export-notes" class="secondary">导出 Markdown</button></div><textarea id="notes-editor" placeholder="写笔记…" aria-label="研究笔记"></textarea><div id="notes-rendered" class="markdown" hidden></div></section>
+    </section>
+  </main>
+  <div id="quick-menu" role="toolbar" aria-label="选区操作" hidden><button id="quick-translate">翻译</button><button id="quick-explain">解释</button><button id="quick-ask">提问</button><span></span><button id="quick-to-chat" title="把选区发送至对话">对话</button></div>
+  <div id="quick-panel" role="dialog" aria-label="临时提问" hidden>
+    <div id="quick-handle"><span>临时提问 <small>不存入历史</small></span><button id="quick-close" class="quiet" title="关闭 · Esc" aria-label="关闭临时提问">×</button></div>
+    <div id="quick-source"></div><div id="quick-answer" class="markdown" aria-live="polite"></div>
+    <div id="quick-actions" hidden><button id="quick-copy" class="quiet small">复制</button><button id="quick-note" class="quiet small">加入笔记</button><button id="quick-keep" class="quiet small">保存到对话</button></div>
+    <form id="quick-form"><textarea id="quick-prompt" rows="1" aria-label="临时问题" placeholder="问一句…"></textarea><button id="quick-send" class="primary" title="发送 · Enter">↑</button><button type="button" id="quick-stop" class="secondary" hidden>停止</button></form>
+  </div>
+  <div id="dock-preview" hidden><span>松开停靠到右侧</span></div>
+  <div id="toast" role="status" hidden></div>
+  <dialog id="settings-dialog"><form id="settings-form"><div class="dialog-title"><div><h2>模型设置</h2></div><button type="button" id="close-settings" class="quiet">✕</button></div><p class="muted">提问内容将发送至所选模型服务。</p><button id="load-zotero-models" type="button" class="secondary full">从 Zotero 导入模型</button><div id="zotero-model-import" hidden><select id="zotero-models" aria-label="Zotero 中的模型"></select><button id="import-zotero-model" type="button" class="primary">导入所选模型</button></div><label>协议<select id="protocol"><option value="openai_chat_compat">OpenAI Compatible（含 DeepSeek 等）</option><option value="responses_api">OpenAI Responses</option><option value="anthropic_messages">Anthropic Messages</option><option value="gemini_native">Gemini</option><option value="ollama_native">Ollama 本地模型</option><option value="codex_responses">Codex 本机已有登录</option></select></label><label>API 地址<input id="api-base" type="url" required placeholder="https://api.openai.com/v1"></label><label>模型名称<input id="model-name" required placeholder="填写服务商提供的模型 ID"></label><label>API Key<input id="api-key" type="password" autocomplete="off" placeholder="保存在系统加密存储中"></label><p id="key-status" class="muted"></p><div class="dialog-actions"><button id="clear-key" type="button" class="quiet">清除已保存的 Key</button><button type="submit" class="primary">保存设置</button></div></form></dialog>
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>

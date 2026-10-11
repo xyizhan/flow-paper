@@ -1,0 +1,7 @@
+[submodule "vendor/llm-for-zotero"]
+	path = vendor/llm-for-zotero
+	url = https://github.com/yilewang/llm-for-zotero.git
+[submodule "vendor/embedpdf"]
+	path = vendor/embedpdf
+	url = https://github.com/embedpdf/embed-pdf-viewer.git
+	branch = v2
