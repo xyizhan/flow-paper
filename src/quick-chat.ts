@@ -15,7 +15,7 @@ export function createQuickChat({ api, markdown, escape, ready, settings, toast 
   }
   function setBusy(value: boolean) {
     busy = value; $('quick-send').hidden = value; $('quick-stop').hidden = !value;
-    $('quick-keep').disabled = value; $('quick-actions').hidden = !current?.content;
+    $('quick-keep').disabled = value; $('quick-note').disabled = value; $('quick-actions').hidden = !current?.content;
   }
   function paint() {
     const nearBottom = answer.scrollHeight - answer.scrollTop - answer.clientHeight < 70;
@@ -77,8 +77,7 @@ export function createQuickChat({ api, markdown, escape, ready, settings, toast 
   $('quick-copy').onclick = () => { if (current?.content) void navigator.clipboard.writeText(current.content).then(() => toast('已复制')); };
   $('quick-note').onclick = async () => {
     if (!current?.content || !attachment) return;
-    const text = `${attachment.title} · [第 ${attachment.page} 页](#source=${encodeURIComponent(attachment.paperId)}&page=${attachment.page})\n\n${current.content}`;
-    try { await api.appendNotes(text); toast('已加入笔记'); } catch (e: any) { toast(e.message); }
+    try { const result = await api.saveAnswer({ temporaryId: session, messageId: current.id }); toast(result.duplicate ? '这条问答已保存。' : result.conflict ? '外部笔记已有修改，问答已另存。' : '问答已保存到论文笔记。'); } catch (e: any) { toast(e.message); }
   };
   $('quick-keep').onclick = async () => {
     try { await api.keepTemporary(session); close(); } catch (e: any) { toast(e.message); }

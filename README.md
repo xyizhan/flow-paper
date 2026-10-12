@@ -1,6 +1,6 @@
 # Flow Paper
 
-[English](README.en.md) · [下载安装](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2) · [使用与配置](docs/USAGE.md)
+[English](README.en.md) · [下载安装](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1) · [使用与配置](docs/USAGE.md)
 
 <img src="assets/icon.png" width="88" alt="Flow Paper icon">
 
@@ -10,9 +10,9 @@
 
 ## 下载
 
-**[下载 Apple 芯片 Mac 安装包（DMG）](https://github.com/xyizhan/flow-paper/releases/download/v0.2.0-beta.2/Flow-Paper-0.2.0-beta.2-macos-arm64.dmg)**
+**[下载 Apple 芯片 Mac 安装包（DMG）](https://github.com/xyizhan/flow-paper/releases/download/v0.3.0-beta.1/Flow-Paper-0.3.0-beta.1-macos-arm64.dmg)**
 
-首个公开预览版 `0.2.0-beta.2`。支持 Apple Silicon（M 系列）；打包最低版本为 macOS 13，本次本机验证环境为 macOS 26.5。暂未发布 Intel、Windows 或 Linux 安装包。
+当前预览版 `0.3.0-beta.1`。支持 Apple Silicon（M 系列）；打包最低版本为 macOS 13，本次本机验证环境为 macOS 26.5。暂未发布 Intel、Windows 或 Linux 安装包。
 
 打开 DMG，将 **Flow Paper.app** 拖入 Applications。也提供 ZIP、包含上游代码的源码包与 SHA-256 校验文件。
 
@@ -24,6 +24,7 @@
 - **对话窗口可停靠、可弹出**：点右上角按钮切换，或拖动六点手柄到阅读器右边缘，看到预览后松手吸附。调整侧栏宽度、移动到第二块屏幕，草稿与正在生成的回答都会保留。
 - **多篇论文对话**：勾选论文进行比较，或检索已索引的文献库；回答提供原文页码链接。
 - **阅读与记录**：多标签 PDF、搜索、高亮、批注、Markdown 笔记及导出。PDF 渲染和文本提取在本机完成。
+- **Obsidian 论文笔记**：一篇论文一个 Markdown 文件，沿用库内模板。保存问答时附带选区、截图和页码；外部修改自动读回，冲突草稿单独保留。[使用说明](docs/OBSIDIAN.md)
 - **连接 Zotero**：只读接入本机个人文献库及分类，可导入 LLM for Zotero 已有模型设置。也可直接打开本地 PDF。
 
 ![选句后就地临时提问](docs/assets/quick-chat.png)
@@ -34,7 +35,7 @@
 
 ## 数据与边界
 
-论文原文件和 Zotero 数据库不被修改。Flow Paper 的索引、批注、笔记与长期对话保存在本机工作区；点击发送时，选定上下文与图片会交给所配置的模型服务。API Key 用 Electron safeStorage 加密保存。没有内置统计上报和自动更新器。[隐私说明](docs/PRIVACY.md)
+论文原文件和 Zotero 数据库不被修改。Flow Paper 的索引、批注与长期对话保存在本机工作区；论文笔记和截图可直接保存到选定 Obsidian 库；点击发送时，选定上下文与图片会交给所配置的模型服务。API Key 用 Electron safeStorage 加密保存。没有内置统计上报和自动更新器。[隐私说明](docs/PRIVACY.md)
 
 多篇分析使用文本提取与上游 BM25 检索，超过预算时会标为部分检索，并不表示逐篇读完了整个库。目前没有 Paperlib 接入、群组库、Zotero 批注双向同步、OCR 或自主综述 Agent。扫描件可以阅读和截图提问。模型回答需自行核对。
 

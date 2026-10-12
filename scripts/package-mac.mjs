@@ -48,6 +48,7 @@ try {
     appBundleId: 'io.github.xyizhan.flow-paper', appCategoryType: 'public.app-category.productivity', icon,
     overwrite: true, prune: false, asar: false, darwinDarkModeSupport: true,
     extendInfo: { LSMinimumSystemVersion: '13.0', NSHumanReadableCopyright: 'AGPL-3.0-or-later. See Help → Project source.',
+      CFBundleURLTypes: [{ CFBundleURLName: 'Flow Paper source links', CFBundleURLSchemes: ['flow-paper'] }],
       CFBundleDocumentTypes: [{ CFBundleTypeName: 'PDF document', CFBundleTypeRole: 'Viewer', LSHandlerRank: 'Alternate', LSItemContentTypes: ['com.adobe.pdf'] }] },
   });
   const app = path.join(paths[0], 'Flow Paper.app');

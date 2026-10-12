@@ -23,7 +23,7 @@ const common = { bundle: true, logLevel: 'info', sourcemap: !release, loader: { 
 await build({ ...common, entryPoints: ['src/main.ts'], outfile: 'dist/main.cjs', platform: 'node', format: 'cjs', external: ['electron'], target: 'node24' });
 await build({ ...common, entryPoints: ['src/preload.ts'], outfile: 'dist/preload.cjs', platform: 'node', format: 'cjs', external: ['electron'] });
 await build({ ...common, entryPoints: ['src/renderer.ts'], outfile: 'dist/renderer.js', platform: 'browser', format: 'esm', target: 'chrome140' });
-await build({ ...common, entryPoints: ['src/context.ts', 'src/ai.ts', 'src/zotero-settings.ts'], outdir: 'dist/test', platform: 'node', format: 'esm', target: 'node24' });
+await build({ ...common, entryPoints: ['src/context.ts', 'src/ai.ts', 'src/zotero-settings.ts', 'src/notes-store.ts'], outdir: 'dist/test', platform: 'node', format: 'esm', target: 'node24', external: ['yaml'] });
 await cp('src/index.html', 'dist/index.html');
 await cp('src/styles.css', 'dist/styles.css');
 await cp('node_modules/@embedpdf/snippet/dist', 'dist/embedpdf', { recursive: true });

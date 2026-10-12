@@ -19,6 +19,23 @@ export function coalesceCommandUpdates(registry: any) {
 }
 
 export function preserveClosingViewState(registry: any) {
+  // Cursor and viewport effects can also run during the same deferred unmount.
+  // Only these read-only getters receive a snapshot; mutations stay untouched.
+  for (const [id, getter, value] of [
+    ['interaction-manager', 'getCurrentCursor', (snapshot: any) => snapshot.cursor],
+    ['viewport', 'isGated', (snapshot: any) => snapshot.gates.size > 0],
+  ] as const) {
+    const plugin = registry.getPlugin(id);
+    if (!plugin?.onDocumentClosed || !plugin[getter]) continue;
+    const closed = new Map<string, any>(), close = plugin.onDocumentClosed.bind(plugin), loading = plugin.onDocumentLoadingStarted.bind(plugin), read = plugin[getter].bind(plugin);
+    plugin.onDocumentClosed = (documentId: string) => {
+      const snapshot = plugin.state.documents[documentId]; if (snapshot) closed.set(documentId, snapshot);
+      if (closed.size > 200) closed.delete(closed.keys().next().value!);
+      close(documentId);
+    };
+    plugin.onDocumentLoadingStarted = (documentId: string) => { closed.delete(documentId); loading(documentId); };
+    plugin[getter] = (documentId?: string) => documentId && !registry.getStore().getState().core.documents[documentId] && closed.has(documentId) ? value(closed.get(documentId)) : read(documentId);
+  }
   // A pending Scroller effect can subscribe after its document and emitter have
   // already been removed. Only subscriptions for known, fully closed documents
   // are inert; live documents retain upstream behavior (including errors).

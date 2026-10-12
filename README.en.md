@@ -1,6 +1,6 @@
 # Flow Paper
 
-[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2)
+[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1)
 
 [Social posters (Chinese)](docs/social/xiaohongshu/README.md)
 
@@ -10,15 +10,16 @@ An independent macOS paper reader with contextual AI chat, built on [LLM for Zot
 - Dock persistent chat on the right or pop it into a separate native window. Drag its six-dot handle to the reader's right edge and release over the preview to dock. Drafts, attachments and active streams survive the move.
 - Compare selected papers or search the indexed library, with page links back to evidence.
 - PDF tabs, highlights, annotations, Markdown notes and export. Local PDF rendering and text extraction.
+- One Markdown note per paper in your Obsidian vault, using your template. Saved Q&A includes excerpts, screenshots and source-page links. External edits are reloaded; conflicting drafts are preserved separately. [Notes guide (Chinese)](docs/OBSIDIAN.md).
 - Read-only local Zotero integration, plus direct PDF import. Configure your own model service; no API keys are bundled.
 
 ![Temporary selection chat with generated test content](docs/assets/quick-chat.png)
 
 ## Install
 
-The first public preview, `0.2.0-beta.2`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
+The current preview, `0.3.0-beta.1`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
 
-Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.2.0-beta.2), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
+Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
 
 The current interface and detailed user documentation are in Chinese. Model replies can be requested in any language.
 
@@ -41,7 +42,7 @@ Ordinary tests use generated PDFs and a loopback mock service, with real Electro
 
 ## Privacy and scope
 
-Original PDFs and the Zotero database are not modified. Annotations, notes and persistent chats live in your local workspace. Sending a question transmits selected context and images to your configured model service. API keys are encrypted with Electron safeStorage. Optional Codex authentication uses an existing local auth file through upstream code and may refresh it. No built-in analytics or auto-updater. See [privacy](docs/PRIVACY.md).
+Original PDFs and the Zotero database are not modified. Annotations and persistent chats live in your local workspace. Paper notes and images can be stored directly in your chosen Obsidian vault, with local recovery revisions. Sending a question transmits selected context and images to your configured model service. API keys are encrypted with Electron safeStorage. Optional Codex authentication uses an existing local auth file through upstream code and may refresh it. No built-in analytics or auto-updater. See [privacy](docs/PRIVACY.md).
 
 Library chat uses BM25 retrieval within a context budget, not exhaustive reading of every paper. Paperlib, group libraries, OCR, Zotero annotation sync and autonomous review agents are not implemented. The source retains upstream modules but does not claim to expose every upstream feature.
 

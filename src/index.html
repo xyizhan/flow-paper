@@ -40,7 +40,13 @@
         <div id="messages" class="messages"></div>
         <div class="composer"><div id="attachments" class="attachments"></div><textarea id="prompt" rows="2" placeholder="输入问题…" aria-label="向论文提问"></textarea><div class="composer-footer"><span id="scope-label"></span><button id="send-button" class="primary" title="⌘ / Ctrl + Enter">发送 ↑</button><button id="stop-button" class="secondary" hidden>停止</button></div></div>
       </section>
-      <section id="notes-panel" hidden><div class="notes-toolbar"><span id="notes-status">自动保存</span><button id="notes-preview" class="quiet">预览</button><button id="export-notes" class="secondary">导出 Markdown</button></div><textarea id="notes-editor" placeholder="写笔记…" aria-label="研究笔记"></textarea><div id="notes-rendered" class="markdown" hidden></div></section>
+      <section id="notes-panel" hidden>
+        <div class="note-heading"><select id="note-target" aria-label="笔记对应论文"></select><button id="notes-connect" class="quiet small">保存位置</button></div>
+        <div id="note-path" class="note-path"></div>
+        <div class="notes-toolbar"><span id="notes-status">请打开论文</span><button id="notes-retry" class="quiet" title="重试保存">↻</button><button id="notes-preview" class="quiet">预览</button><button id="notes-open" class="quiet" disabled>Obsidian ↗</button><button id="export-notes" class="quiet">导出</button></div>
+        <div id="note-conflict" hidden><span id="note-conflict-text"></span><div><button id="note-conflict-open" class="quiet small">查看草稿</button><button id="note-load-external" class="secondary small">载入外部版本</button></div></div>
+        <textarea id="notes-editor" placeholder="写笔记…" aria-label="研究笔记" disabled></textarea><div id="notes-rendered" class="markdown" hidden></div>
+      </section>
     </section>
   </main>
   <div id="quick-menu" role="toolbar" aria-label="选区操作" hidden><button id="quick-translate">翻译</button><button id="quick-explain">解释</button><button id="quick-ask">提问</button><span></span><button id="quick-to-chat" title="把选区发送至对话">对话</button></div>
@@ -53,6 +59,7 @@
   <div id="dock-preview" hidden><span>松开停靠到右侧</span></div>
   <div id="toast" role="status" hidden></div>
   <dialog id="settings-dialog"><form id="settings-form"><div class="dialog-title"><div><h2>模型设置</h2></div><button type="button" id="close-settings" class="quiet">✕</button></div><p class="muted">提问内容将发送至所选模型服务。</p><button id="load-zotero-models" type="button" class="secondary full">从 Zotero 导入模型</button><div id="zotero-model-import" hidden><select id="zotero-models" aria-label="Zotero 中的模型"></select><button id="import-zotero-model" type="button" class="primary">导入所选模型</button></div><label>协议<select id="protocol"><option value="openai_chat_compat">OpenAI Compatible（含 DeepSeek 等）</option><option value="responses_api">OpenAI Responses</option><option value="anthropic_messages">Anthropic Messages</option><option value="gemini_native">Gemini</option><option value="ollama_native">Ollama 本地模型</option><option value="codex_responses">Codex 本机已有登录</option></select></label><label>API 地址<input id="api-base" type="url" required placeholder="https://api.openai.com/v1"></label><label>模型名称<input id="model-name" required placeholder="填写服务商提供的模型 ID"></label><label>API Key<input id="api-key" type="password" autocomplete="off" placeholder="保存在系统加密存储中"></label><p id="key-status" class="muted"></p><div class="dialog-actions"><button id="clear-key" type="button" class="quiet">清除已保存的 Key</button><button type="submit" class="primary">保存设置</button></div></form></dialog>
+  <dialog id="notes-config-dialog"><form id="notes-config-form"><div class="dialog-title"><h2>笔记保存位置</h2><button id="notes-config-close" type="button" class="quiet">✕</button></div><label>Obsidian 库目录<input id="notes-vault" required readonly></label><button id="notes-pick-vault" type="button" class="secondary">选择库…</button><label>论文目录<input id="notes-folder" required value="research/论文"></label><label>论文模板<input id="notes-template" required value="templates/paper.md"></label><p class="muted">目录和模板使用库内相对路径。切换保存位置后，原文件仍留在原处。</p><div class="dialog-actions"><button type="submit" class="primary">连接并保存</button></div></form></dialog>
   <script type="module" src="renderer.js"></script>
 </body>
 </html>

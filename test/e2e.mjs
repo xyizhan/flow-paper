@@ -1,6 +1,6 @@
 import { _electron as electron } from 'playwright';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { mkdir, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdir, writeFile, readFile, rm, rename } from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
 import assert from 'node:assert/strict';
@@ -10,6 +10,7 @@ const output = path.resolve('test-output');
 await mkdir(output, {recursive:true});
 const dataDir = path.join(output, 'profile');
 await rm(dataDir, {recursive:true, force:true});
+const notesVault=path.join(output,'notes-vault');await rm(notesVault,{recursive:true,force:true});await mkdir(path.join(notesVault,'.obsidian'),{recursive:true});await mkdir(path.join(notesVault,'templates'));await writeFile(path.join(notesVault,'templates/paper.md'),'---\ntype: paper\nstatus: 在读\n---\n# {{title}}\n\n## 方法核心\n');
 const pdf = await PDFDocument.create(); const font = await pdf.embedFont(StandardFonts.Helvetica);
 for (let i=0; i<3; i++) {
   const page = pdf.addPage([612,792]);
@@ -52,6 +53,7 @@ try {
   const page=await desktop.firstWindow();
   const observe=p=>{p.on('pageerror',e=>{errors.push(e.message);console.error(e.stack);});p.on('console',m=>{if(m.type()==='error')console.log('renderer:',m.text());});};observe(page);
   await page.waitForFunction(()=>!!window.__suPaper,{timeout:60000});
+  await page.evaluate(vault=>window.paper.configureNotes({vault,folder:'research/论文',template:'templates/paper.md'}),notesVault);
   assert.equal(await page.locator('.research').isVisible(),false);
   assert.equal((await page.evaluate(()=>window.paper.load())).conversations.length,0);
   await page.screenshot({path:path.join(output,'empty.png')});
@@ -128,10 +130,14 @@ try {
   // Keep the release point inside the native window, and exercise the actual
   // renderer pointer handlers plus the main-process snap hit test.
   await desktop.evaluate(({BaseWindow,BrowserWindow})=>{const b=BrowserWindow.getAllWindows()[0].getContentBounds();BaseWindow.getAllWindows().find(w=>w.getTitle()==='对话 — Flow Paper').setBounds({x:b.x+b.width-620,y:b.y,width:620,height:700});});
+  await chat.bringToFront();
+  await chat.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await chat.evaluate(()=>{window.__dragEvents=[];for(const type of ['pointerdown','pointermove','pointerup','lostpointercapture'])document.addEventListener(type,e=>window.__dragEvents.push({type,x:e.screenX,y:e.screenY,target:e.target.id}),true);});
   const grip=await chat.locator('#research-drag').boundingBox();
   await chat.mouse.move(grip.x+grip.width/2,grip.y+grip.height/2);await chat.mouse.down();
   await chat.mouse.move(585,100,{steps:12});
-  await page.locator('#dock-preview').waitFor({state:'visible'});
+  try { await page.locator('#dock-preview').waitFor({state:'visible'}); }
+  catch(e) { console.error('Dock drag diagnostics',await chat.evaluate(()=>window.__dragEvents.slice(-20)),await desktop.evaluate(({BaseWindow})=>BaseWindow.getAllWindows().map(w=>({title:w.getTitle(),bounds:w.getContentBounds()}))));throw e; }
   assert.equal((await page.evaluate(()=>window.paper.researchLayout())).mode,'floating');
   await chat.mouse.up();await page.waitForFunction(()=>document.body.classList.contains('chat-docked'));
   await page.locator('#dock-preview').waitFor({state:'hidden'});
@@ -153,7 +159,7 @@ try {
   await chat.locator('#research-mode').click();await page.waitForFunction(()=>document.body.classList.contains('chat-docked'));
   assert.equal(await chat.evaluate(()=>performance.timeOrigin),chatOwner);
   await chat.waitForFunction(()=>!document.getElementById('send-button').hidden&&document.querySelector('.message.assistant')?.textContent.includes('注意力机制'));
-  await chat.locator('.message-actions [data-note]').click();assert.match(await chat.locator('#notes-editor').inputValue(),/注意力机制/);
+  await chat.locator('.message-actions [data-note]').click();await chat.waitForFunction(()=>document.getElementById('notes-editor').value.includes('注意力机制'));
   await chat.locator('#chat-tab').click();await chat.locator('.message.assistant .bubble a[href^="#source="]').click();
   await page.waitForFunction(()=>window.__suPaper.capability('scroll').getCurrentPage()===2);
   console.log('PASS docking, resizing, popout and returning preserve the same renderer, draft, selection and active stream');
@@ -169,6 +175,28 @@ try {
   await page.locator('#quick-note').click();
   await chat.waitForFunction(()=>document.getElementById('notes-editor').value.includes('注意力机制'));
   assert.match(await chat.locator('#notes-editor').inputValue(),/UNSAVED_NOTE_DRAFT/);
+  const noteRef={paperId:(await page.evaluate(()=>window.__suPaper.getState().papers))[0].id};
+  const noteA=await page.evaluate(ref=>window.paper.loadNote(ref),noteRef);
+  assert.match(noteA.path,/research\/论文/);assert.match(noteA.text,/解释图中的注意力机制/);assert.match(noteA.text,/!\[论文截图\]/);assert.doesNotMatch(noteA.text,/#source=/);
+  await page.locator('#quick-note').click();await page.evaluate(()=>window.__suPaper.flush());
+  assert.equal((await page.evaluate(ref=>window.paper.loadNote(ref),noteRef)).text,noteA.text,'duplicate button click is idempotent');
+  await writeFile(noteA.path,noteA.text+'\nOBSIDIAN_EDIT\n');
+  await chat.waitForFunction(()=>document.getElementById('notes-editor').value.includes('OBSIDIAN_EDIT'));
+  const base=await page.evaluate(ref=>window.paper.loadNote(ref),noteRef);
+  await chat.locator('#notes-editor').fill((await chat.locator('#notes-editor').inputValue())+'\nFLOW_DRAFT_CONFLICT\n');
+  await writeFile(base.path,base.text+'\nOBSIDIAN_CONCURRENT_EDIT\n');
+  await chat.locator('#note-conflict').waitFor({state:'visible'});
+  assert.doesNotMatch(await readFile(base.path,'utf8'),/FLOW_DRAFT_CONFLICT/);
+  const conflictNote=await page.evaluate(ref=>window.paper.loadNote(ref),noteRef);
+  assert.match(await readFile(conflictNote.conflictPath,'utf8'),/FLOW_DRAFT_CONFLICT/);
+  await chat.locator('#note-load-external').click();await chat.waitForFunction(()=>document.getElementById('notes-editor').value.includes('OBSIDIAN_CONCURRENT_EDIT'));
+  const renamed=path.join(path.dirname(base.path),'renamed-paper.md');await rename(base.path,renamed);
+  await chat.waitForFunction(()=>document.getElementById('note-path').textContent.endsWith('renamed-paper.md'));
+  await chat.locator('#notes-preview').click();await chat.waitForFunction(()=>[...document.querySelectorAll('#notes-rendered img')].some(i=>i.src.startsWith('data:image/')&&i.naturalWidth>0));
+  assert.doesNotMatch(await chat.locator('#notes-rendered').textContent(),/flow-paper-entry:/);
+  assert.ok(await chat.locator('#notes-rendered a[href^="#source="][href$="page=2"]').count());
+  await chat.locator('#notes-preview').click();
+  console.log('PASS Obsidian template, per-paper files, idempotent Q&A, portable screenshot preview, external edits, conflicts and rename');
   await page.locator('#quick-keep').click();
   await chat.waitForFunction(()=>document.querySelector('.message.user img'));
   assert.equal((await page.evaluate(()=>window.paper.load())).conversations.length,2);
@@ -176,7 +204,12 @@ try {
   await chat.waitForFunction(()=>!document.getElementById('send-button').hidden);
   assert.ok(capturedRequest.messages.slice(0,-1).some(m=>Array.isArray(m.content)&&m.content.some(c=>c.type==='image_url')));
   console.log('PASS real capture, vision payload, explicit Keep, image follow-up and concurrent notes preservation');
-  const secondPdf=path.join(output,'second-paper.pdf');await writeFile(secondPdf,await pdf.save());
+  await chat.locator('#notes-tab').click();await chat.locator('#notes-preview').click();
+  await page.evaluate(id=>window.__suPaper.openPaper(id,1),noteRef.paperId);
+  await chat.locator('#notes-rendered a[href^="#source="][href$="page=2"]').last().click();
+  await page.waitForFunction(()=>window.__suPaper.capability('scroll').getCurrentPage()===2);
+  await chat.locator('#notes-preview').click();await chat.locator('#chat-tab').click();
+  const secondPdf=path.join(output,'second-paper.pdf');pdf.getPages()[0].drawText('A distinct second study',{x:50,y:100,size:12,font});await writeFile(secondPdf,await pdf.save());
   await page.evaluate(p=>window.__suPaper.importFiles([p]),secondPdf);
   await page.locator('.paper-card input').nth(0).check();await page.locator('.paper-card input').nth(1).check();
   await chat.waitForFunction(()=>document.getElementById('scope-label').textContent.includes('2 篇'));
@@ -185,7 +218,10 @@ try {
   assert.match(JSON.stringify(capturedRequest),/research-fixture/);assert.match(JSON.stringify(capturedRequest),/second-paper/);
   await chat.screenshot({path:path.join(output,'conversation-window.png')});
   await page.screenshot({path:path.join(output,'reader.png')});
-  console.log('PASS multi-paper context across windows');
+  await chat.locator('.message-actions [data-note]').last().click();await chat.waitForFunction(()=>document.getElementById('note-path').textContent.includes('/专题/'));
+  const topicPath=await chat.locator('#note-path').textContent();assert.match(await readFile(topicPath,'utf8'),/比较两篇论文/);
+  await chat.locator('#note-target').selectOption('current');await chat.locator('#chat-tab').click();
+  console.log('PASS multi-paper context and topic-note routing across windows');
   {await page.locator('#zotero-button').click();await page.getByText('Zotero fixture paper',{exact:true}).click();await page.waitForFunction(()=>window.__suPaper.getState().papers.some(p=>p.source==='zotero'&&p.indexed));console.log('PASS Zotero metadata and local attachment resolution');}
   await page.evaluate(async()=>{const s=window.__suPaper,id=s.getState().papers[0].id;await s.openPaper(id);s.capability('annotation').forDocument(id).createAnnotation(1,{id:'quick-close-mark',type:5,pageIndex:1,rect:{origin:{x:30,y:30},size:{width:180,height:20}},color:'#fff19a',opacity:0.4,strokeWidth:1,strokeColor:'#e5b143',flags:[],created:new Date()});const lateUI=s.capability('ui').forDocument(id),lateZoom=s.capability('zoom').forDocument(id);await s.capability('document-manager').closeDocument(id).toPromise();if(!lateUI.getState()||!lateZoom.getState())throw new Error('Late toolbar effects lost state');const scroll=s.registry.getPlugin('scroll');let lateEvent=false;scroll.onScrollerData(id,()=>lateEvent=true)();if(lateEvent)throw new Error('Closed scroller emitted a layout');await s.flush();await s.openPaper(id,2);let liveEvent=false;scroll.onScrollerData(id,()=>liveEvent=true)();if(!liveEvent)throw new Error('Reopened scroller lost live layout subscription');});
   assert.ok(await page.evaluate(()=>{const s=window.__suPaper;return !!s.capability('annotation').forDocument(s.getState().papers[0].id).getAnnotationById('quick-close-mark')}));
@@ -213,7 +249,7 @@ try {
   const restored=await desktop.firstWindow();
   await restored.waitForFunction(()=>{const s=window.__suPaper;if(!s)return false;try{return s.capability('annotation').forDocument(s.getState().papers[0].id).getAnnotationById('quick-close-mark');}catch{return false;}},undefined,{timeout:30000});
   stored=JSON.parse(await readFile(path.join(dataDir,'workspace.json'),'utf8'));
-  assert.equal(stored.conversations.length,2);assert.match(stored.notes,/UNSAVED_NOTE_DRAFT/);assert.equal(JSON.stringify(stored).includes('TEMP_PRIVATE_SENTINEL'),false);
+  assert.equal(stored.conversations.length,2);const restoredNote=await restored.evaluate(()=>window.paper.loadNote({paperId:window.__suPaper.getState().papers[0].id}));assert.match(restoredNote.text,/UNSAVED_NOTE_DRAFT/);assert.equal(JSON.stringify(stored).includes('TEMP_PRIVATE_SENTINEL'),false);
   console.log('PASS restart, annotation restoration, no ephemeral data persisted, no renderer errors');
 } catch(e) {
   if(desktop) { const pages=desktop.windows(); for(let i=0;i<pages.length;i++)await pages[i].screenshot({path:path.join(output,`failure-${i}.png`)}).catch(()=>{}); }

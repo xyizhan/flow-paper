@@ -2,6 +2,7 @@ import EmbedPDF from '@embedpdf/snippet';
 import DOMPurify from 'dompurify';
 import { renderMarkdown } from '../vendor/llm-for-zotero/src/utils/markdown';
 import { createQuickChat } from './quick-chat';
+import { createNotesEditor } from './notes-editor';
 import { installResearchLayout } from './research-layout';
 import { installStandaloneSidebarResizeBehavior } from '../vendor/llm-for-zotero/src/modules/contextPanel/standaloneWindowSizing';
 import { resizeTextareaToContent } from '../vendor/llm-for-zotero/src/modules/contextPanel/textareaSizing';
@@ -12,7 +13,7 @@ const researchMode = new URLSearchParams(location.search).get('view') === 'resea
 document.body.classList.toggle('research-mode', researchMode);
 const $ = (id: string) => document.getElementById(id) as any;
 const escape = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]!));
-const markdown = (s: string) => DOMPurify.sanitize(renderMarkdown(s), { ADD_TAGS: ['annotation'], ADD_ATTR: ['xmlns', 'encoding'] });
+const markdown = (s: string) => DOMPurify.sanitize(renderMarkdown(s), { ADD_TAGS: ['annotation'], ADD_ATTR: ['xmlns', 'encoding'], ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|flow-paper|zotero):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i });
 let state: any, registry: any, docs: any, engine: any;
 let activeId = '', conversationId = '', streaming = false, selection: any = null;
 const selected = new Set<string>();
@@ -23,10 +24,10 @@ const annotationSubscriptions = new Map<string, () => void>();
 const positions = new Map<string, number>();
 let positionTimer: any;
 const opening = new Map<string, Promise<any>>();
-let indexing = false, notesTimer: any, toastTimer: any;
+let indexing = false, toastTimer: any;
 let activationRequest = 0, selectionGeneration = 0;
 let quick: ReturnType<typeof createQuickChat>, selectionAnchor = { x: 350, y: 200 };
-let notesDirty = false;
+let notes: ReturnType<typeof createNotesEditor>;
 let pendingConversation = '';
 
 function toast(message: string) { $('toast').textContent = message; $('toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').hidden = true, 6000); }
@@ -261,16 +262,16 @@ function switchTab(notes: boolean) {
   $('notes-tab').classList.toggle('active', notes); $('chat-tab').classList.toggle('active', !notes);
 }
 async function addNote(messageId: string) {
-  const message = activeConversation().messages.find((m: any) => m.id === messageId);
-  $('notes-editor').value += `${$('notes-editor').value ? '\n\n---\n\n' : ''}${message.content}\n`;
-  state.notes = $('notes-editor').value; await api.saveNotes(state.notes); switchTab(true); toast('回答已加入研究笔记。');
+  const result = await api.saveAnswer({ conversationId, messageId });
+  await notes.showSaved(result); switchTab(true); toast(result.duplicate ? '这条问答已保存。' : result.conflict ? '问答已另存到冲突副本。' : '问答已保存到论文笔记。');
 }
 
 async function init() {
   state = await api.load(); conversationId = state.activeConversation;
   installResearchLayout(api, researchMode);
 
-  $('notes-editor').value = state.notes; $('model-indicator').classList.toggle('ready', !!state.settings.model);
+  $('model-indicator').classList.toggle('ready', !!state.settings.model);
+  if (researchMode) { notes = createNotesEditor({ api, markdown, escape, toast, currentPaper: () => getPaper() }); await notes.init(); }
   renderLibrary(); renderConversations(); renderMessages();
   if (researchMode) { $('paper-title').textContent = '对话与笔记'; document.title = '对话 — Flow Paper'; }
   else {
@@ -314,9 +315,6 @@ async function init() {
   $('protocol').onchange = () => { if ($('protocol').value === 'ollama_native') $('api-base').value = 'http://127.0.0.1:11434'; };
   $('clear-key').onclick = () => safe(async () => { state.settings = await api.saveSettings({ ...state.settings, clearKey: true }); $('key-status').textContent = '已清除 API Key。'; });
   $('notes-tab').onclick = () => switchTab(true); $('chat-tab').onclick = () => switchTab(false);
-  $('notes-editor').oninput = () => { notesDirty = true; $('notes-status').textContent = '保存中…'; clearTimeout(notesTimer); notesTimer = setTimeout(() => safe(async () => { state.notes = $('notes-editor').value; await api.saveNotes(state.notes); notesDirty = false; $('notes-status').textContent = '已保存'; }), 350); };
-  $('notes-preview').onclick = () => { const preview = $('notes-rendered').hidden; $('notes-rendered').innerHTML = markdown($('notes-editor').value); $('notes-rendered').hidden = !preview; $('notes-editor').hidden = preview; $('notes-preview').textContent = preview ? '编辑' : '预览'; };
-  $('export-notes').onclick = () => safe(async () => { if (await api.exportNotes($('notes-editor').value)) toast('笔记已导出。'); });
   $('index-all').onclick = () => safe(async () => {
     if (indexing) return; indexing = true; $('index-all').disabled = true;
     const previous = activeId; let skipped = 0;
@@ -329,7 +327,7 @@ async function init() {
       toast(`文献索引完成${skipped ? `，${skipped} 份不可读取的附件已跳过。` : '。'}`);
     } finally { indexing = false; $('index-all').disabled = false; if (previous) await openPaper(previous); }
   });
-  document.addEventListener('click', (event: any) => { const a = event.composedPath().find((n: any) => n?.tagName === 'A'); if (!a) return; const href = a.getAttribute('href') || ''; if (href.startsWith('#source=')) { event.preventDefault(); const query = new URLSearchParams(href.slice(1)); void safe(() => openPaper(query.get('source')!, Number(query.get('page')) || 1)); } else if (/^https?:\/\//i.test(href)) { event.preventDefault(); void api.openExternal(href); } });
+  document.addEventListener('click', (event: any) => { const a = event.composedPath().find((n: any) => n?.tagName === 'A'); if (!a) return; const href = a.getAttribute('href') || ''; if (href.startsWith('#source=')) { event.preventDefault(); const query = new URLSearchParams(href.slice(1)); void safe(() => openPaper(query.get('source')!, Number(query.get('page')) || 1)); } else if (/^(https?|flow-paper|zotero):\/\//i.test(href)) { event.preventDefault(); void api.openExternal(href); } });
   document.addEventListener('dragover', e => e.preventDefault());
   document.addEventListener('drop', e => { e.preventDefault(); const paths = Array.from(e.dataTransfer?.files || []).map(f => api.filePath(f)); if (paths.length) void safe(() => importFiles(paths)); });
   api.onStream((event: any) => {
@@ -350,12 +348,12 @@ async function init() {
   });
   api.onImported(() => safe(reload));
   api.onSettings((settings: any) => { state.settings = settings; $('model-indicator').classList.toggle('ready', !!settings.model); });
-  api.onNotes((notes: string) => { state.notes = notes; $('notes-editor').value = notes; $('notes-rendered').innerHTML = markdown(notes); });
   if (researchMode) {
     const receive = async () => {
       const next = await api.takeResearch(); const loaded = await api.load();
       state.papers = loaded.papers; state.settings = loaded.settings;
       activeId = next.activeId;
+      await notes.contextChanged();
       const selectionChanged = JSON.stringify([...selected]) !== JSON.stringify(next.selectedIds);
       selected.clear(); next.selectedIds.forEach((id: string) => selected.add(id));
       if (selectionChanged && selected.size) $('chat-scope').value = 'selected';
@@ -366,6 +364,7 @@ async function init() {
       }
       else if (next.conversationId) { pendingConversation = next.conversationId; toast('已保存；当前回答结束后打开'); }
       if (next.tab) switchTab(next.tab === 'notes');
+      if (next.noteTarget) await notes.showSaved(await api.loadNote(next.noteTarget).then((note: any) => ({ ...note, target: next.noteTarget })));
       updateScope();
     };
     api.onResearch(() => safe(receive)); await receive();
@@ -378,9 +377,8 @@ async function init() {
     await setupReader();
   }
   const flush = async () => {
-    clearTimeout(notesTimer);
     clearTimeout(positionTimer); if (!researchMode) await savePositions();
-    if (researchMode && notesDirty) { await api.saveNotes($('notes-editor').value); notesDirty = false; }
+    if (researchMode) await notes.flush();
     for (const [id, timer] of annotationTimers) {
       clearTimeout(timer);
       await api.saveAnnotations(id, await annotationSnapshots.get(id));
@@ -388,5 +386,6 @@ async function init() {
   };
   window.__suPaper = { openPaper, importFiles, registry, capability, flush, getState: () => state };
   if (!researchMode && state.papers.length) await safe(() => openPaper(state.papers[0].id));
+  if (!researchMode) await api.readerReady();
 }
 void init().catch(e => { console.error(e); toast(`启动失败：${e.message}`); });
