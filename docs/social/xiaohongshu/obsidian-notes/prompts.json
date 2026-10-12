@@ -1,0 +1,46 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-12",
+  "format": "PNG, 1086 × 1448, portrait 3:4",
+  "applicationVersion": "0.3.0-beta.2",
+  "sourcePaper": "https://arxiv.org/abs/1706.03762",
+  "note": "Posters are generated editorial layouts based on real screenshots. The separate screenshots are unretouched app captures in an isolated demo profile and vault. Q&A is a real model response saved by Flow Paper; template summary bullets are manually prepared public-paper examples. No personal library or account information is included.",
+  "posters": [
+    {
+      "file": "01-read-ask-save.png",
+      "prompt": "Use case: ads-marketing. Create ONE polished Chinese Xiaohongshu promotional poster, portrait 3:4, 1536 x 2048 if possible, for the NEW Obsidian note saving feature of Flow Paper.\nInput 1: an authentic Flow Paper app screenshot reading the public paper Attention Is All You Need, with a real model reply and the 加入笔记 control. Supporting compositing input, preserve the real product UI as faithfully as possible; crop it for legibility rather than invent UI.\nInput 2: an authentic Obsidian screenshot of the same question, figure and answer saved in one paper note in a clean demo vault. Supporting compositing input. Keep recognizable actual Obsidian UI, the Transformer figure, note title, research/论文 folder and original-page link. Only demo data.\nInput 3: actual Flow Paper brand icon. Preserve this exact flat blue icon design.\nArt direction: a thoughtful independent Mac app release poster, warm off-white background, deep navy typography, soft periwinkle-purple emphasis for Obsidian and one restrained pale yellow highlighter. Crisp typography, disciplined editorial layout, elegant and useful, no AI robot, neon, fake 3D computer, decorative dashboard cards or noisy doodles. Match a serious academic reading tool with some warmth.\nLayout: compact icon + Flow Paper masthead at top, small label 笔记更新 and page number 01. Bold two-line headline occupying only the top quarter. A concise subtitle. The middle/lower 60% is a visual story using TWO large straight-on crops from the authentic screenshots: Flow Paper question with the 加入笔记 action visible, then Obsidian note showing the saved figure and answer. Use an understated connecting line/arrow with labels “读论文 · 提问” and “加入笔记 → Obsidian”. Ensure each screenshot crop has usable readable size, do not shrink full windows into postage stamps; crop away empty margins. Preserve actual UI instead of reimagining it. Bottom one concise capability line and GitHub URL.\nEXACT EXTERNAL COPY, no extra slogans:\n“Flow Paper”\n“笔记更新”\n“边读边问，”\n“笔记进 Obsidian。”\n“点一次「加入笔记」，问答、截图、出处一起留存。”\n“读论文 · 提问”\n“加入笔记 → Obsidian”\n“一篇论文一个 Markdown · 沿用你的论文模板”\n“开源 · Mac · Apple 芯片”\n“github.com/xyizhan/flow-paper”\nFine print: “公开论文与示范笔记库 · 基于真机截图排版”\nSmall attribution: “论文：Vaswani 等，Attention Is All You Need（2017）”\nPage number “01”.\nTruth constraints: only explicitly saved answers go to notes; never claim all conversations autosave. No automatic summarization/template completion claim. No cloud synchronization claim. No unqualified zero-conflict claim. No private accounts, home-directory paths, unrelated paper names or secret keys. Keep visible demo folder names only. Do not add a QR code.",
+      "inputs": [
+        {
+          "path": "screenshots/01-flow-paper-question.png",
+          "role": "actual Flow Paper compositing reference"
+        },
+        {
+          "path": "screenshots/03-obsidian-saved-answer.png",
+          "role": "actual Obsidian compositing reference"
+        },
+        {
+          "path": "../../../../assets/icon.png",
+          "role": "existing brand icon"
+        }
+      ]
+    },
+    {
+      "file": "02-one-paper-one-note.png",
+      "prompt": "Use case: ads-marketing. Create ONE refined Chinese Xiaohongshu promotional poster, portrait 3:4, 1536 x 2048 if possible. Companion page 02 for Flow Paper's new Obsidian note integration.\nInput 1: authentic Obsidian screenshot with the clean Flow Paper Demo vault, research/论文 folder and the Attention Is All You Need paper note using an existing template. Supporting compositing input. Preserve the actual app interface as faithfully as possible; use a large readable crop.\nInput 2: authentic Obsidian screenshot showing the saved paper figure, question, answer and source page link. Supporting compositing input, for a smaller supporting crop.\nInput 3: actual Flow Paper icon. Preserve its flat blue design.\nStyle: warm ivory, deep navy Chinese typography, restrained periwinkle-purple and pale yellow accents, clear editorial hierarchy. Premium independent Mac utility feeling, like a researcher showing their actual workspace, not a fake AI dashboard. Avoid glossy 3D devices, cartoon robot/brain, floating shapes, excess empty margins and clutter.\nLayout: compact Flow Paper masthead and 02 top. Bold two-line headline, concise subtitle. One dominant straight-on Obsidian screenshot region taking approximately 55% of the poster: emphasize the research/论文 tree, a single Attention Is All You Need note and its real template headings. Integrate a neat smaller detail crop of the figure/question/source link if space allows, with the caption “保存的问答与原图”. Under it, three compact editorial rows explaining actual benefits; no giant pill cards. Balanced phone-screen-readable type.\nEXACT EXTERNAL COPY:\n“Flow Paper”\n“Obsidian 笔记联动”\n“一篇论文，”\n“一份长期笔记。”\n“读完继续整理，笔记留在你自己的库里。”\n“research / 论文”\n“保存的问答与原图”\n“沿用现有模板”\n“问答、截图与原文页码一起保存”\n“在两边继续编辑”\n“有冲突时保留副本，交由你合并”\n“本地 Markdown”\n“一个论文文件夹，一篇论文一个文件”\n“开源 · Mac · Apple 芯片”\n“github.com/xyizhan/flow-paper”\nFine print: “公开论文与示范笔记库 · 基于真机截图排版”\nSmall attribution: “论文：Vaswani 等，Attention Is All You Need（2017）”\nPage number “02”.\nTruth constraints: this is one locally shared Markdown note, not a cloud sync service. Existing-template summary bullets in the screenshot are manually prepared demo notes, not a claim of automatic summary generation. Do not add autonomous organization, all-chats-saved, automatic overwrite or guaranteed zero-conflict claims. Only research/论文 and demo file/folder names may be visible, never personal vault names, accounts, absolute private paths or credentials. Preserve supplied branding. No QR code.",
+      "inputs": [
+        {
+          "path": "screenshots/02-obsidian-paper-note.png",
+          "role": "actual Obsidian compositing reference"
+        },
+        {
+          "path": "screenshots/03-obsidian-saved-answer.png",
+          "role": "actual Obsidian compositing reference"
+        },
+        {
+          "path": "../../../../assets/icon.png",
+          "role": "existing brand icon"
+        }
+      ]
+    }
+  ]
+}
