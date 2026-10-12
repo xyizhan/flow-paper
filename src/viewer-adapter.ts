@@ -41,13 +41,13 @@ export function preserveClosingViewState(registry: any) {
   // are inert; live documents retain upstream behavior (including errors).
   const scroll = registry.getPlugin('scroll');
   if (scroll?.onScrollerData && scroll.onDocumentClosed) {
-    const closed = new Set<string>();
+    const closed = new Map<string, any>();
     const close = scroll.onDocumentClosed.bind(scroll);
     const loading = scroll.onDocumentLoadingStarted.bind(scroll);
     const subscribe = scroll.onScrollerData.bind(scroll);
     scroll.onDocumentClosed = (id: string) => {
-      closed.add(id);
-      if (closed.size > 200) closed.delete(closed.values().next().value!);
+      const snapshot = scroll.state.documents[id]; if (snapshot) closed.set(id, snapshot);
+      if (closed.size > 200) closed.delete(closed.keys().next().value!);
       close(id);
     };
     scroll.onDocumentLoadingStarted = (id: string) => { closed.delete(id); loading(id); };
@@ -55,6 +55,11 @@ export function preserveClosingViewState(registry: any) {
       if (closed.has(id) && !registry.getStore().getState().core.documents[id]) return () => {};
       return subscribe(id, callback);
     };
+    for (const [getter, field] of [['getCurrentPage', 'currentPage'], ['getTotalPages', 'totalPages'], ['getPageChangeState', 'pageChangeState']]) {
+      const read = scroll[getter].bind(scroll);
+      scroll[getter] = (id?: string) => id && closed.has(id) && !registry.getStore().getState().core.documents[id]
+        ? closed.get(id)[field] : read(id);
+    }
   }
   // Preact can finish a toolbar's pending effect after the PDF close action has
   // removed plugin state. Keep only the read-only UI snapshot during unmount;

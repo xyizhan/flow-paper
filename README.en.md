@@ -1,6 +1,6 @@
 # Flow Paper
 
-[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1)
+[中文](README.md) · [Download for Apple Silicon](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.2)
 
 [Social posters (Chinese)](docs/social/xiaohongshu/README.md)
 
@@ -17,9 +17,9 @@ An independent macOS paper reader with contextual AI chat, built on [LLM for Zot
 
 ## Install
 
-The current preview, `0.3.0-beta.1`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
+The current preview, `0.3.0-beta.2`, targets Apple Silicon Macs. The bundle requires macOS 13 or later; local validation was performed on macOS 26.5. Intel, Windows and Linux installers are not provided.
 
-Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
+Download the DMG from [Releases](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.2), then drag **Flow Paper.app** into Applications. An app ZIP, source ZIP including the pinned upstream trees, and checksums are also provided. This preview is ad-hoc signed, **not** Developer ID signed or notarized. Use macOS **System Settings → Privacy & Security → Open Anyway** if the system blocks it. Do not disable Gatekeeper or SIP. See [installation](docs/INSTALL.md).
 
 The current interface and detailed user documentation are in Chinese. Model replies can be requested in any language.
 

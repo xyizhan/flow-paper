@@ -1,6 +1,6 @@
 # Flow Paper
 
-[English](README.en.md) · [下载安装](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.1) · [使用与配置](docs/USAGE.md)
+[English](README.en.md) · [下载安装](https://github.com/xyizhan/flow-paper/releases/tag/v0.3.0-beta.2) · [使用与配置](docs/USAGE.md)
 
 <img src="assets/icon.png" width="88" alt="Flow Paper icon">
 
@@ -10,9 +10,9 @@
 
 ## 下载
 
-**[下载 Apple 芯片 Mac 安装包（DMG）](https://github.com/xyizhan/flow-paper/releases/download/v0.3.0-beta.1/Flow-Paper-0.3.0-beta.1-macos-arm64.dmg)**
+**[下载 Apple 芯片 Mac 安装包（DMG）](https://github.com/xyizhan/flow-paper/releases/download/v0.3.0-beta.2/Flow-Paper-0.3.0-beta.2-macos-arm64.dmg)**
 
-当前预览版 `0.3.0-beta.1`。支持 Apple Silicon（M 系列）；打包最低版本为 macOS 13，本次本机验证环境为 macOS 26.5。暂未发布 Intel、Windows 或 Linux 安装包。
+当前预览版 `0.3.0-beta.2`。支持 Apple Silicon（M 系列）；打包最低版本为 macOS 13，本次本机验证环境为 macOS 26.5。暂未发布 Intel、Windows 或 Linux 安装包。
 
 打开 DMG，将 **Flow Paper.app** 拖入 Applications。也提供 ZIP、包含上游代码的源码包与 SHA-256 校验文件。
 
